@@ -25,30 +25,109 @@
       }
 
       main {
-        width: min(100%, 520px);
+        width: min(100%, 620px);
         padding: 32px;
-        text-align: center;
         background: white;
         border: 1px solid #e2e8f0;
         border-radius: 20px;
         box-shadow: 0 16px 48px #20304a14;
       }
 
+      h1,
+      h2 {
+        margin-top: 0;
+        text-align: center;
+      }
+
       h1 {
-        margin: 0 0 8px;
+        margin-bottom: 8px;
         font-size: 2rem;
       }
 
-      #instruction {
-        min-height: 3em;
+      #instruction,
+      #auth-message,
+      #stats,
+      #leaderboard-message {
         color: #526078;
         line-height: 1.5;
       }
 
+      #instruction,
+      #auth-message,
+      #leaderboard-message {
+        text-align: center;
+      }
+
+      #instruction {
+        min-height: 1.5em;
+      }
+
+      .panel {
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+      }
+
+      .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 6px;
+        color: #526078;
+        font-size: 0.9rem;
+      }
+
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        font: inherit;
+      }
+
+      input:focus {
+        border-color: #315fe8;
+        outline: 2px solid #315fe833;
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .buttons button {
+        padding: 10px 18px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: white;
+        color: #182235;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .buttons button.primary {
+        border-color: #315fe8;
+        background: #315fe8;
+        color: white;
+      }
+
+      .buttons button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
       #target {
         width: 100%;
-        min-height: 230px;
-        margin: 18px 0;
+        min-height: 200px;
+        margin: 8px 0;
         border: 0;
         border-radius: 14px;
         background: #dce3ed;
@@ -70,65 +149,210 @@
         color: white;
       }
 
-      .buttons {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-      }
-
-      .buttons button {
-        padding: 10px 20px;
-        border: 1px solid #cbd5e1;
-        border-radius: 9px;
-        background: white;
-        color: #182235;
-        font: inherit;
-        font-weight: 600;
-        cursor: pointer;
-      }
-
-      .buttons button:first-child {
-        border-color: #315fe8;
-        background: #315fe8;
-        color: white;
-      }
-
-      .buttons button:disabled {
+      #target:disabled {
         cursor: not-allowed;
-        opacity: 0.6;
       }
 
-      #stats {
-        margin: 20px 0 0;
-        color: #526078;
+      #leaderboard {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      #leaderboard th,
+      #leaderboard td {
+        padding: 9px 6px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      #leaderboard th:last-child,
+      #leaderboard td:last-child {
+        text-align: right;
+      }
+
+      .section {
+        margin-top: 20px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        font-size: 1.3rem;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 520px) {
+        main {
+          padding: 22px;
+        }
+
+        .field-row {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
       }
     </style>
   </head>
   <body>
     <main>
       <h1>Reaction Time Test</h1>
-      <p id="instruction">Press Start, then click the box when it turns green.</p>
-      <button id="target" type="button">Ready?</button>
-      <div class="buttons">
-        <button id="start" type="button">Start</button>
-        <button id="share" type="button">Share</button>
-      </div>
-      <p id="stats" aria-live="polite"></p>
+      <p id="instruction">Sign in or create an account to play and save your times.</p>
+
+      <section id="auth-panel" class="panel" aria-label="Account">
+        <div class="field-row">
+          <div>
+            <label for="username">Username</label>
+            <input id="username" name="username" autocomplete="username" minlength="3" maxlength="20" required>
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required>
+          </div>
+        </div>
+        <div class="buttons">
+          <button id="login" class="primary" type="button">Log in</button>
+          <button id="register" type="button">Create account</button>
+        </div>
+        <p id="auth-message" aria-live="polite"></p>
+      </section>
+
+      <section id="game-panel" class="panel section" aria-label="Reaction time game" hidden>
+        <p id="signed-in-as"></p>
+        <button id="target" type="button" disabled>Ready?</button>
+        <div class="buttons">
+          <button id="start" class="primary" type="button">Start</button>
+          <button id="share" type="button">Share</button>
+          <button id="logout" type="button">Log out</button>
+        </div>
+        <p id="stats" aria-live="polite"></p>
+      </section>
+
+      <section id="leaderboard-panel" class="section" aria-label="Leaderboard" hidden>
+        <h2>Leaderboard</h2>
+        <p id="leaderboard-message" aria-live="polite"></p>
+        <table id="leaderboard">
+          <thead>
+            <tr><th scope="col">Rank</th><th scope="col">Username</th><th scope="col">Best time</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
     </main>
 
     <script>
       const instruction = document.querySelector("#instruction");
+      const authPanel = document.querySelector("#auth-panel");
+      const authMessage = document.querySelector("#auth-message");
+      const usernameInput = document.querySelector("#username");
+      const passwordInput = document.querySelector("#password");
+      const gamePanel = document.querySelector("#game-panel");
+      const signedInAs = document.querySelector("#signed-in-as");
       const target = document.querySelector("#target");
       const startButton = document.querySelector("#start");
       const shareButton = document.querySelector("#share");
       const stats = document.querySelector("#stats");
+      const leaderboardPanel = document.querySelector("#leaderboard-panel");
+      const leaderboardMessage = document.querySelector("#leaderboard-message");
+      const leaderboardBody = document.querySelector("#leaderboard tbody");
 
       let state = "idle";
       let timerId;
       let goTime;
-      const results = [];
+      let isAuthenticated = false;
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, {
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        if (!response.headers.get("Content-Type")?.includes("application/json")) {
+          throw new Error("Open this game through its Python server, not as a local HTML file.");
+        }
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Something went wrong. Please try again.");
+        }
+        return data;
+      }
+
+      function showSignedOut() {
+        isAuthenticated = false;
+        state = "idle";
+        if (timerId) {
+          window.clearTimeout(timerId);
+          timerId = undefined;
+        }
+        authPanel.hidden = false;
+        gamePanel.hidden = true;
+        leaderboardPanel.hidden = true;
+        target.disabled = true;
+        startButton.disabled = false;
+        instruction.textContent = "Sign in or create an account to play and save your times.";
+      }
+
+      async function loadLeaderboard() {
+        leaderboardPanel.hidden = false;
+        leaderboardMessage.textContent = "Loading scores...";
+        leaderboardBody.replaceChildren();
+        try {
+          const data = await api("/api/leaderboard");
+          leaderboardMessage.textContent = data.scores.length
+            ? ""
+            : "No scores yet. Play a round to get on the board!";
+          for (const [index, score] of data.scores.entries()) {
+            const row = document.createElement("tr");
+            for (const value of [index + 1, score.username, `${score.best_ms} ms`]) {
+              const cell = document.createElement("td");
+              cell.textContent = value;
+              row.append(cell);
+            }
+            leaderboardBody.append(row);
+          }
+        } catch (error) {
+          leaderboardMessage.textContent = error.message;
+        }
+      }
+
+      function showSignedIn(user) {
+        isAuthenticated = true;
+        authPanel.hidden = true;
+        gamePanel.hidden = false;
+        leaderboardPanel.hidden = false;
+        target.disabled = false;
+        signedInAs.textContent = `Signed in as ${user.username}`;
+        instruction.textContent = "Press Start, then click the box when it turns green.";
+        loadLeaderboard();
+      }
+
+      async function authenticate(endpoint) {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        if (!username || !password) {
+          authMessage.textContent = "Enter a username and password.";
+          return;
+        }
+
+        authMessage.textContent = "Please wait...";
+        try {
+          const data = await api(endpoint, {
+            method: "POST",
+            body: JSON.stringify({ username, password }),
+          });
+          passwordInput.value = "";
+          authMessage.textContent = "";
+          showSignedIn(data.user);
+        } catch (error) {
+          authMessage.textContent = error.message;
+        }
+      }
 
       function startTrial() {
+        if (!isAuthenticated || state !== "idle") {
+          return;
+        }
         state = "waiting";
         target.className = "waiting";
         target.textContent = "Wait for green...";
@@ -138,6 +362,7 @@
       }
 
       function showGo() {
+        timerId = undefined;
         state = "go";
         goTime = performance.now();
         target.className = "go";
@@ -145,9 +370,24 @@
         instruction.textContent = "Click the green box or press Space!";
       }
 
+      async function saveScore(elapsed) {
+        stats.textContent = "Saving your time...";
+        try {
+          const result = await api("/api/scores", {
+            method: "POST",
+            body: JSON.stringify({ reaction_ms: Math.round(elapsed) }),
+          });
+          stats.textContent = `Saved: ${result.score.reaction_ms} ms. Your best is ${result.best_ms} ms.`;
+          loadLeaderboard();
+        } catch (error) {
+          stats.textContent = `Your time was ${Math.round(elapsed)} ms, but it wasn't saved: ${error.message}`;
+        }
+      }
+
       function respond() {
         if (state === "waiting") {
           window.clearTimeout(timerId);
+          timerId = undefined;
           state = "idle";
           target.className = "";
           target.textContent = "Too soon!";
@@ -155,23 +395,37 @@
           startButton.disabled = false;
         } else if (state === "go") {
           const elapsed = performance.now() - goTime;
-          results.push(elapsed);
-          const average = results.reduce((total, result) => total + result, 0) / results.length;
           state = "idle";
           target.className = "";
           target.textContent = `${Math.round(elapsed)} ms`;
           instruction.textContent = "Nice! Press Start to try again.";
-          stats.textContent = `Average: ${Math.round(average)} ms across ${results.length} trial${results.length === 1 ? "" : "s"}.`;
           startButton.disabled = false;
+          saveScore(elapsed);
         }
       }
 
+      document.querySelector("#login").addEventListener("click", () => authenticate("/api/login"));
+      document.querySelector("#register").addEventListener("click", () => authenticate("/api/register"));
+      passwordInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          authenticate("/api/login");
+        }
+      });
       startButton.addEventListener("click", startTrial);
       target.addEventListener("click", respond);
       document.addEventListener("keydown", (event) => {
-        if (event.code === "Space" && state !== "idle") {
+        if (event.code === "Space" && isAuthenticated && state !== "idle") {
           event.preventDefault();
           respond();
+        }
+      });
+
+      document.querySelector("#logout").addEventListener("click", async () => {
+        try {
+          await api("/api/logout", { method: "POST", body: "{}" });
+          showSignedOut();
+        } catch (error) {
+          instruction.textContent = `Couldn't log out: ${error.message}`;
         }
       });
 
@@ -193,6 +447,19 @@
           }
         }
       });
+
+      api("/api/me")
+        .then((data) => {
+          if (data.user) {
+            showSignedIn(data.user);
+          } else {
+            showSignedOut();
+          }
+        })
+        .catch((error) => {
+          showSignedOut();
+          authMessage.textContent = `The server is unavailable: ${error.message}`;
+        });
     </script>
   </body>
 </html>
