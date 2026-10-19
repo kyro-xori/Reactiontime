@@ -5,16 +5,17 @@ A reaction-time game with username/password accounts and a shared leaderboard.
 ## Run it locally
 
 1. Install Python 3.10 or newer.
-2. From this folder, install the dependencies:
+2. From this folder, create a virtual environment and install the dependencies:
 
    ```powershell
-   py -m pip install -r requirements.txt
+   py -m venv .venv
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
    ```
 
 3. Start the web app:
 
    ```powershell
-   py app.py
+   .\.venv\Scripts\python.exe app.py
    ```
 
 4. Open <http://127.0.0.1:5000>.
