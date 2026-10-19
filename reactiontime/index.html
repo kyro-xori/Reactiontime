@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reaction Time Test</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, sans-serif;
+        color: #182235;
+        background: #f3f6fb;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      main {
+        width: min(100%, 520px);
+        padding: 32px;
+        text-align: center;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        box-shadow: 0 16px 48px #20304a14;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 2rem;
+      }
+
+      #instruction {
+        min-height: 3em;
+        color: #526078;
+        line-height: 1.5;
+      }
+
+      #target {
+        width: 100%;
+        min-height: 230px;
+        margin: 18px 0;
+        border: 0;
+        border-radius: 14px;
+        background: #dce3ed;
+        color: #182235;
+        font: inherit;
+        font-size: 1.6rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 120ms ease;
+      }
+
+      #target.waiting {
+        background: #dc554f;
+        color: white;
+      }
+
+      #target.go {
+        background: #23a45a;
+        color: white;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .buttons button {
+        padding: 10px 20px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: white;
+        color: #182235;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .buttons button:first-child {
+        border-color: #315fe8;
+        background: #315fe8;
+        color: white;
+      }
+
+      .buttons button:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      #stats {
+        margin: 20px 0 0;
+        color: #526078;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Reaction Time Test</h1>
+      <p id="instruction">Press Start, then click the box when it turns green.</p>
+      <button id="target" type="button">Ready?</button>
+      <div class="buttons">
+        <button id="start" type="button">Start</button>
+        <button id="share" type="button">Share</button>
+      </div>
+      <p id="stats" aria-live="polite"></p>
+    </main>
+
+    <script>
+      const instruction = document.querySelector("#instruction");
+      const target = document.querySelector("#target");
+      const startButton = document.querySelector("#start");
+      const shareButton = document.querySelector("#share");
+      const stats = document.querySelector("#stats");
+
+      let state = "idle";
+      let timerId;
+      let goTime;
+      const results = [];
+
+      function startTrial() {
+        state = "waiting";
+        target.className = "waiting";
+        target.textContent = "Wait for green...";
+        instruction.textContent = "Don't click yet!";
+        startButton.disabled = true;
+        timerId = window.setTimeout(showGo, 2000 + Math.random() * 3000);
+      }
+
+      function showGo() {
+        state = "go";
+        goTime = performance.now();
+        target.className = "go";
+        target.textContent = "CLICK!";
+        instruction.textContent = "Click the green box or press Space!";
+      }
+
+      function respond() {
+        if (state === "waiting") {
+          window.clearTimeout(timerId);
+          state = "idle";
+          target.className = "";
+          target.textContent = "Too soon!";
+          instruction.textContent = "Wait until the box turns green, then try again.";
+          startButton.disabled = false;
+        } else if (state === "go") {
+          const elapsed = performance.now() - goTime;
+          results.push(elapsed);
+          const average = results.reduce((total, result) => total + result, 0) / results.length;
+          state = "idle";
+          target.className = "";
+          target.textContent = `${Math.round(elapsed)} ms`;
+          instruction.textContent = "Nice! Press Start to try again.";
+          stats.textContent = `Average: ${Math.round(average)} ms across ${results.length} trial${results.length === 1 ? "" : "s"}.`;
+          startButton.disabled = false;
+        }
+      }
+
+      startButton.addEventListener("click", startTrial);
+      target.addEventListener("click", respond);
+      document.addEventListener("keydown", (event) => {
+        if (event.code === "Space" && state !== "idle") {
+          event.preventDefault();
+          respond();
+        }
+      });
+
+      shareButton.addEventListener("click", async () => {
+        const shareData = { title: document.title, url: window.location.href };
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(window.location.href);
+            shareButton.textContent = "Link copied!";
+            window.setTimeout(() => {
+              shareButton.textContent = "Share";
+            }, 2000);
+          }
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            instruction.textContent = "Couldn't share automatically. Copy the page address from your browser.";
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
