@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: reactiontime
+    runtime: python
+    plan: free
+    rootDir: reactiontime
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 30
+    healthCheckPath: /api/me
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: reactiontime-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+
+databases:
+  - name: reactiontime-db
+    plan: basic-256mb
