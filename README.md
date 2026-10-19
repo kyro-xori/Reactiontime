@@ -7,8 +7,9 @@ To run locally, install its dependencies and start its Python server:
 
 ```powershell
 cd reactiontime
-py -m pip install -r requirements.txt
-py app.py
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe app.py
 ```
 
 Then open <http://127.0.0.1:5000>. For the shared online version, deploy the
